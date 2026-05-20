@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="UTF-8">
+<title>Pro Todo List</title>
+
+<style>
+body{
+    font-family:Arial;
+    background:#0f172a;
+    color:white;
+    display:flex;
+    justify-content:center;
+    margin-top:50px;
+}
+
+.box{
+    width:420px;
+    background:#1e293b;
+    padding:20px;
+    border-radius:12px;
+}
+
+input{
+    width:70%;
+    padding:10px;
+    border:none;
+    border-radius:6px;
+}
+
+button{
+    padding:10px;
+    border:none;
+    border-radius:6px;
+    cursor:pointer;
+}
+
+.addBtn{background:#22c55e;color:black;}
+
+ul{list-style:none;padding:0;margin-top:20px;}
+
+li{
+    background:#334155;
+    padding:10px;
+    margin:8px 0;
+    border-radius:6px;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+}
+
+.done{
+    text-decoration:line-through;
+    opacity:0.6;
+}
+
+.smallBtn{
+    margin-left:5px;
+    padding:5px 8px;
+    font-size:12px;
+}
+
+.filters button{
+    margin:5px;
+    background:#475569;
+    color:white;
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="box">
+
+<h2>📝 Pro Todo List</h2>
+
+<input id="task" placeholder="Yangi vazifa...">
+<button class="addBtn" onclick="addTask()">Qo‘shish</button>
+
+<div class="filters">
+<button onclick="setFilter('all')">Hammasi</button>
+<button onclick="setFilter('active')">Aktiv</button>
+<button onclick="setFilter('done')">Bajarilgan</button>
+</div>
+
+<ul id="list"></ul>
+
+</div>
+
+<script>
+
+let tasks = JSON.parse(localStorage.getItem("tasks")) || [];
+let filter = "all";
+
+function save(){
+    localStorage.setItem("tasks", JSON.stringify(tasks));
+}
+
+function addTask(){
+    let text = document.getElementById("task").value;
+
+    if(text.trim()==""){
+        alert("Bo‘sh bo‘lmasin!");
+        return;
+    }
+
+    tasks.push({text:text, done:false});
+    document.getElementById("task").value="";
+    save();
+    render();
+}
+
+function toggle(i){
+    tasks[i].done = !tasks[i].done;
+    save();
+    render();
+}
+
+function del(i){
+    tasks.splice(i,1);
+    save();
+    render();
+}
+
+function setFilter(f){
+    filter = f;
+    render();
+}
+
+function render(){
+
+    let list = document.getElementById("list");
+    list.innerHTML = "";
+
+    tasks.forEach((t,i)=>{
+
+        if(filter=="active" && t.done) return;
+        if(filter=="done" && !t.done) return;
+
+        let li = document.createElement("li");
+
+        li.innerHTML = `
+            <span class="${t.done ? 'done' : ''}">${t.text}</span>
+            <div>
+                <button class="smallBtn" onclick="toggle(${i})">✔</button>
+                <button class="smallBtn" onclick="del(${i})">🗑</button>
+            </div>
+        `;
+
+        list.appendChild(li);
+    });
+}
+
+render();
+
+</script>
+
+</body>
+</html>
